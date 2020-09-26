@@ -18,10 +18,11 @@ def selectReg(obj, num, setData):
 def serverStart():
     sock = socket(AF_INET, SOCK_STREAM)
     sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-    sock.bind(('', 8080))
+    sock.bind(('13.59.200.128', 8080))
     sock.listen()
 
     selectReg(sock, 0, acceptConnection)
+
 
 
 def acceptConnection(socket):
@@ -31,15 +32,33 @@ def acceptConnection(socket):
 
 
 
+def checkRequest(request):
+    lst = request.split(' ')
+    method = lst[0]
+    urlRequest = lst[1]
+
+    if method == 'GET':
+        if urlRequest == '/':
+            return 'HTTP/1.1 \r\n\r\n<style>div{margin-top:40px;margin-left:30px}</style> <div><a href=/register>register</a> <br> <a href=/login>login</a></div>'
+        return False
+    print(lst)
+
+
+
 def getRequest(client):
     request = client.recv(1024)
     if request:
         selector.unregister(client)
         print('yes connect')
+
+        response = checkRequest(request.decode())
+        if response:
+            client.send(response.encode())
+
     client.close()
 
-def setResponse(clien):
-    pass
+
+
 
 def eventLoop():
     serverStart()
