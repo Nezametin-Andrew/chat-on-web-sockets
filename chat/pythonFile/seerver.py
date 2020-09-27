@@ -2,7 +2,11 @@ from socket import *
 import selectors
 
 selector = selectors.DefaultSelector()
-
+URLS = {
+    '/': 'HTTP/1.1  200 OK\r\n\r\n<style>div{margin-top:40px;margin-left:30px}</style> <div><a href=/register>register</a> <br> <a href=/login>login</a></div>',
+    '/register': 'HTTP/1.1  200 OK\r\n\r\n',
+    '/login': 'HTTP/1.1  200 OK\r\n\r\n'
+}
 
 def selectReg(obj, num, setData):
     read = selectors.EVENT_READ
@@ -13,7 +17,8 @@ def selectReg(obj, num, setData):
     else:
         selector.register(fileobj=obj, events=write, data=setData)
 
-
+def sendDataPost():
+    pass
 
 def serverStart():
     sock = socket(AF_INET, SOCK_STREAM)
@@ -38,10 +43,18 @@ def checkRequest(request):
     urlRequest = lst[1]
 
     if method == 'GET':
-        if urlRequest == '/':
-            return 'HTTP/1.1 \r\n\r\n<style>div{margin-top:40px;margin-left:30px}</style> <div><a href=/register>register</a> <br> <a href=/login>login</a></div>'
-        return False
-    print(lst)
+        for key in URLS:
+            if key == urlRequest:
+                print(urlRequest)
+                return URLS[key]
+
+        print(urlRequest)
+        return 'HTTP/1.1 404 NOT FOUND\r\n\r\n <h1>ERROR 404 <BR> NOT FOUND</h1>'
+    elif method == 'POST':
+
+        pass
+
+
 
 
 
