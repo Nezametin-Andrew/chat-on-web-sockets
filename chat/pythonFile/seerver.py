@@ -18,7 +18,7 @@ def selectReg(obj, num, setData):
 def serverStart():
     sock = socket(AF_INET, SOCK_STREAM)
     sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-    sock.bind(('13.59.200.128', 8080))
+    sock.bind(('', 8080))
     sock.listen()
 
     selectReg(sock, 0, acceptConnection)
