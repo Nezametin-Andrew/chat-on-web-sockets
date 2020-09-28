@@ -11,4 +11,4 @@ def getConnect(sock):
     server, addr = sock.accept()
 
 def getData(server):
-    dataPost = server.recv()
+    dataPost = server.recv(1024)

@@ -1,14 +1,18 @@
-from socket import *
+import getpage.return_page
 import selectors
+from socket import *
 
 selector = selectors.DefaultSelector()
+
 URLS = {
-    '/': 'HTTP/1.1  200 OK\r\n\r\n<style>div{margin-top:40px;margin-left:30px}</style> <div><a href=/register>register</a> <br> <a href=/login>login</a></div>',
+    '/': f'HTTP/1.1  200 OK\r\n\r\n',
     '/register': 'HTTP/1.1  200 OK\r\n\r\n',
     '/login': 'HTTP/1.1  200 OK\r\n\r\n'
 }
 
-def selectReg(obj, num, setData):
+
+
+def select_reg(obj, num, setData):
     read = selectors.EVENT_READ
     write = selectors.EVENT_WRITE
 
@@ -17,54 +21,61 @@ def selectReg(obj, num, setData):
     else:
         selector.register(fileobj=obj, events=write, data=setData)
 
-def sendDataPost():
-    pass
 
-def serverStart():
+
+def send_data_post(data):
+    sock_data_send = socket(AF_INET, SOCK_STREAM)
+    sock_data_send.connect('', 8880)
+    sock_data_send.send(data)
+    response_service = sock_data_send.recv(1024)
+    if response_service:
+        return response_service
+    return 'error'
+
+
+
+def server_start():
     sock = socket(AF_INET, SOCK_STREAM)
     sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     sock.bind(('', 8080))
     sock.listen()
 
-    selectReg(sock, 0, acceptConnection)
+    select_reg(sock, 0, accept_connection)
 
 
 
-def acceptConnection(socket):
+def accept_connection(socket):
     client, addr = socket.accept()
 
-    selectReg(client, 0, getRequest)
+    select_reg(client, 0, get_request)
 
 
 
-def checkRequest(request):
+def check_request(request):
     lst = request.split(' ')
     method = lst[0]
-    urlRequest = lst[1]
+    url_request = lst[1]
 
     if method == 'GET':
         for key in URLS:
-            if key == urlRequest:
-                print(urlRequest)
+            if key == url_request:
+                print(url_request)
                 return URLS[key]
 
-        print(urlRequest)
+        print(url_request)
         return 'HTTP/1.1 404 NOT FOUND\r\n\r\n <h1>ERROR 404 <BR> NOT FOUND</h1>'
     elif method == 'POST':
-
-        pass
-
+        return 'Error'
 
 
 
-
-def getRequest(client):
+def get_request(client):
     request = client.recv(1024)
     if request:
         selector.unregister(client)
         print('yes connect')
 
-        response = checkRequest(request.decode())
+        response = check_request(request.decode())
         if response:
             client.send(response.encode())
 
@@ -72,9 +83,8 @@ def getRequest(client):
 
 
 
-
-def eventLoop():
-    serverStart()
+def event_loop():
+    server_start()
     while True:
         events = selector.select()
 
@@ -83,7 +93,7 @@ def eventLoop():
             callBack(key.fileobj)
 
 if __name__ == '__main__':
-    eventLoop()
+    event_loop()
 
 
 
