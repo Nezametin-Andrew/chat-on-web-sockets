@@ -1,9 +1,11 @@
-import getpage.return_page
+import getpage
 import selectors
 from socket import *
 
 selector = selectors.DefaultSelector()
 
+lst = getpage.return_page()
+print(lst)
 URLS = {
     '/': f'HTTP/1.1  200 OK\r\n\r\n',
     '/register': 'HTTP/1.1  200 OK\r\n\r\n',
